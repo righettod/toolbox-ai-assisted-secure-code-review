@@ -164,7 +164,7 @@ flowchart LR
 
 🤖 Use it via this instruction inside a claude code session: `/codebase-hotspots [RELATIVE_PATH_TO_CODEBASE]`.
 
-### Case 3: Review the SemGrep scan of the codebase
+## Case 3: Review the SemGrep scan of the codebase
 
 🤔 In this case, I scanned the codebase with SemGrep to identify issues not linked to a entry point, like for example, a deprecated algorithm used but not called from an entry point.
 
