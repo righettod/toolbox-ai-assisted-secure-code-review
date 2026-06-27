@@ -184,7 +184,7 @@ flowchart LR
 
 # Install
 
-🧑‍💻 Copy the folder [.claude/skills](.claude/skills/) folder into the `.claude` folder to the project to review and use *commands* from a claude code session.
+🧑‍💻 Copy the folder [.claude/skills](.claude/skills/) into the folder `.claude` of the project to review and use *commands* from a claude code session.
 
 # References
 
