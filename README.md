@@ -179,7 +179,11 @@ flowchart LR
 
 # Compatibility note
 
-⚠️ The SKILL.md files use the **Claude Code skill format** (Anthropic proprietary) and cannot be validated with [`skills-ref`](https://pypi.org/project/skills-ref/) (`pip install skills-ref`), which enforces the [agentskills.io open specification](https://agentskills.io/specification). Claude Code-specific frontmatter fields (`argument-hint`, `disable-model-invocation`, etc.) are not allowed by that spec.
+⚠️ The `SKILL.md` files use the **Claude Code skill format** (Anthropic proprietary) and cannot be validated with [`skills-ref`](https://pypi.org/project/skills-ref/) (`pip install skills-ref`), which enforces the [agentskills.io open specification](https://agentskills.io/specification). Claude Code-specific frontmatter fields (`argument-hint`, `disable-model-invocation`, etc.) are not allowed by that specification.
+
+# Install
+
+🧑‍💻 Copy the folder [.claude/skills](.claude/skills/) folder into the `.claude` folder to the project to review and use *commands* from a claude code session.
 
 # References
 
