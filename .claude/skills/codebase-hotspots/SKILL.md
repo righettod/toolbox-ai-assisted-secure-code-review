@@ -1,6 +1,6 @@
 ---
 description: Generate a list of locations in the codebase where risky processing is performed from a security perspective.
-argument-hint: [entry-point-or-package]
+argument-hint: <entry-point-or-package>
 allowed-tools: Read, Glob, Grep, Bash, TaskCreate, Write
 disable-model-invocation: true
 ---

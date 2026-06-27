@@ -1,6 +1,6 @@
 ---
 description: Generate a visual overview of a codebase as a Mermaid flowchart that maps each entry point directly to its final processing point (custom code or a third-party library). Use when the user wants to see, at a glance, where input enters a codebase and where it ultimately gets processed. Works for any common programming language. Optionally scope the analysis to a single entry point or package.
-argument-hint: [entry-point-or-package]
+argument-hint: <entry-point-or-package>
 allowed-tools: Read, Glob, Grep, TaskCreate
 disable-model-invocation: true
 ---
