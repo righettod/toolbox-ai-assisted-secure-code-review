@@ -2,7 +2,7 @@
 
 # Description
 
-> 🗃️ All commands are created as [skills](https://agentskills.io/specification) (new format for the commands) and are stored into this [folder](.claude/skills).
+> 🗃️ All commands are created as **skills** (Claude Code proprietary format, new format for the **commands**) and are stored into this [folder](.claude/skills).
 
 🧑‍💻 This folder contains coding assistant commands that I use to performa secure code review assistant with AI via the coding assistant (claude code in my context).
 
@@ -33,7 +33,7 @@
 
 💡 The SemGrep scan is performed via this dedicated [toolbox](https://github.com/righettod/toolbox-codescan).
 
-# Cases
+# Origin of the creation of the skills based on different cases (context)
 
 ## Case 1: Codebase overview
 
@@ -44,7 +44,7 @@ A visual overview of the information entry points and where the information land
 and if such processing can be risky from a security perspective.
 ```
 
-📦 User prompt is stored, as `claude code command`, into the file in the folder `.claude/commands/codebase-overview.md` ([ref](.claude/commands/codebase-overview.md)).
+📦 User prompt is stored, as `claude code command`, into the file in the folder `.claude/skills/codebase-overview/` ([ref](.claude/skills/codebase-overview/SKILL.md)).
 
 🤖 Use it via this instruction inside a claude code session: `/codebase-overview [RELATIVE_PATH_TO_CODEBASE]`.
 
@@ -56,7 +56,7 @@ and if such processing can be risky from a security perspective.
 * **Rectangle** form represents a custom code *landing* points with a TAG to indicate the type of processing performed and colored if such processing can be risky from a security perspective.
 * **Circle** form represents a third-party library *landing* points and colored if processing performed can be risky from a security perspective.
 
-ℹ️ Node label naming conventions is defined into the section **[Output rules](.claude/commands/codebase-overview.md#output-rules)** section of the command file.
+ℹ️ Node label naming conventions is defined into the section **[Output rules](.claude/skills/codebase-overview/SKILL.md#output-rules)** section of the command file.
 
 🔬 Example of generated schema against the source code of [OWASP WebGoat](https://github.com/WebGoat/WebGoat) using the download of a zip archive of the *main* branch:
 
@@ -159,7 +159,7 @@ flowchart LR
 
 🤔 In this case, the context is that I received a codebase and I want to use claude code to give point to code that does risky processing from a security perspective (called **hotspot*).
 
-📦 User prompt is stored, as `claude code command`, into the file in the folder `.claude/commands/codebase-hotspots.md` ([ref](.claude/commands/codebase-hotspots.md)).
+📦 User prompt is stored, as `claude code command`, into the file in the folder `.claude/skills/codebase-hotspots/` ([ref](.claude/skills/codebase-hotspots/SKILL.md)).
 
 🤖 Use it via this instruction inside a claude code session: `/codebase-hotspots [RELATIVE_PATH_TO_CODEBASE]`.
 
@@ -167,7 +167,7 @@ flowchart LR
 
 🤔 In this case, I scanned the codebase with SemGrep to identify issues not linked to a entry point, like for example, a deprecated algorithm used but not called from an entry point.
 
-📦 User prompt is stored, as `claude code command`, into the file in the folder `.claude/commands/codebase-semgrep-findings-review.md` ([ref](.claude/commands/codebase-semgrep-findings-review.md)).
+📦 User prompt is stored, as `claude code command`, into the file in the folder `.claude/skills/codebase-semgrep-findings-review/` ([ref](.claude/skills/codebase-semgrep-findings-review/SKILL.md)).
 
 🤖 Use it via this instruction inside a claude code session: `/codebase-semgrep-findings-review [PATH_TO_SEMGREP_REPORT] [RELATIVE_PATH_TO_CODEBASE] [MINIMUM_CONFIDENCE_LEVEL]`.
 
@@ -177,16 +177,12 @@ flowchart LR
 * `PARTIAL`: Confirmed + needs-human-review findings.
 * Default: `PARTIAL` - `FALSE_POSITIVE` verdicts are always excluded from the findings list but are recorded in the summary table.
 
-# Security
+# Compatibility note
 
-* The collection of skills is scanned with [NVIDIA/SkillSpector](https://github.com/NVIDIA/SkillSpector) prior to be published.
-* Publishing fail if the risk assessment recommendation computed by SkillSpector is not `SAFE`.
+⚠️ The SKILL.md files use the **Claude Code skill format** (Anthropic proprietary) and cannot be validated with [`skills-ref`](https://pypi.org/project/skills-ref/) (`pip install skills-ref`), which enforces the [agentskills.io open specification](https://agentskills.io/specification). Claude Code-specific frontmatter fields (`argument-hint`, `disable-model-invocation`, etc.) are not allowed by that spec.
 
 # References
 
 * <https://github.com/semgrep/semgrep>
 * <https://en.wikipedia.org/wiki/Sink_(computing)>
 * <https://breachforce.net/source-and-sinks>
-* <https://agentskills.io/specification>
-* <https://github.com/agentskills/agentskills>
-* <https://github.com/NVIDIA/SkillSpector>
