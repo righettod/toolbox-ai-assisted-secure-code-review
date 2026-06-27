@@ -2,20 +2,21 @@
 
 # Description
 
-> 🗃️ All commands are created as **skills** (Claude Code proprietary format, new format for the **commands**) and are stored into this [folder](.claude/skills).
+> 🗃️ All *commands* are created as **skills** (Claude Code proprietary format, new format for the **commands**) and are stored into this [folder](.claude/skills).
 
-🧑‍💻 This folder contains coding assistant commands that I use to performa secure code review assistant with AI via the coding assistant (claude code in my context).
+🧑‍💻 This folder contains coding assistant *commands* that I use to perform a secure code review.
 
 🔬 The idea is to:
 
-1. Convert interesting proposals from the collection of proposals of this [project](https://github.com/righettod/code-snippets-security-utils) into **rules**.
-2. Allow me to learn how to create instructions for a coding assistant (claude code here) to allow to create secure code at the implementation time.
+1. Learn how to leverage AI, via a coding assistant (claude code here), in the context of a secure code review activity.
+2. Define a process to perform a secure code review with the help of AI via a coding assistant.
+3. Allow me to learn how to create instructions for a coding assistant to help me during an secure code review activity.
 
 # Review process
 
 🔬 I imagined the following process against a codebase using claude code sessions:
 
-🧑‍💻 Intital into a claude code session **at the root folder of the codebase**:
+🧑‍💻 Intital steps into a claude code session **at the root folder of the codebase**:
 
 1. Start a new claude code session: *Important to isolate the processing from a context perspective*.
 2. Call the command [`codebase-overview`](#case-1-codebase-overview) to have a global visual overview of the risky sinks.
