@@ -187,7 +187,11 @@ flowchart LR
 
 🧑‍💻 Copy the folder [.claude/skills](.claude/skills/) into the folder `.claude` of the project to review and use *commands* from a claude code session.
 
-💡 The script [install.ps1](install.ps1) can be used too.
+💡 The script [install.ps1](install.ps1) can be used too:
+
+```powershell
+irm https://raw.githubusercontent.com/righettod/toolbox-ai-assisted-secure-code-review/main/install.ps1 | iex`
+```
 
 # References
 
