@@ -187,6 +187,8 @@ flowchart LR
 
 🧑‍💻 Copy the folder [.claude/skills](.claude/skills/) into the folder `.claude` of the project to review and use *commands* from a claude code session.
 
+💡 The script [install.ps1](install.ps1) can be used too.
+
 # References
 
 * <https://github.com/semgrep/semgrep>
