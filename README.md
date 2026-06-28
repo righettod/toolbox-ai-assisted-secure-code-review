@@ -30,9 +30,10 @@
 5. Call the command [`codebase-hotspots`](#case-2-codebase-hotspots) to identify entry point that leads to risk processing from a security perspective.
 6. Review and manually validate the result of step **3** + step **5**.
 
-💡 A approach by module is used to speed-up the review.
+⚠️ Important notes:
 
-💡 The SemGrep scan is performed via this dedicated [toolbox](https://github.com/righettod/toolbox-codescan).
+* A approach **module by module** is used to speed-up the review.
+* The SemGrep scan is performed via this dedicated [toolbox](https://github.com/righettod/toolbox-codescan).
 
 # Origin of the creation of the skills based on different cases (context)
 
