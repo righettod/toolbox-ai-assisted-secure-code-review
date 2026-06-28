@@ -190,7 +190,7 @@ flowchart LR
 💡 The script [install.ps1](install.ps1) can be used too:
 
 ```powershell
-irm https://raw.githubusercontent.com/righettod/toolbox-ai-assisted-secure-code-review/main/install.ps1 | iex`
+irm https://raw.githubusercontent.com/righettod/toolbox-ai-assisted-secure-code-review/main/install.ps1 | iex
 ```
 
 # References
