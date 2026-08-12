@@ -153,3 +153,42 @@ Then group findings by entry point. For each finding, use this structure:
   Keep it minimal — the goal is to confirm reachability, not to produce a working exploit.
 
 After displaying the output, determine the output filename as `Findings-$DATE.md` where `$DATE` is today's date in `YYYY-MM-DD` format, then save the full output — summary table and all individual findings — to that file in the current working directory using the Write tool.
+
+## Test generation
+
+After saving the findings file, generate a single test class or script that contains one test per eligible finding, then save it to the current working directory.
+
+**Eligibility rule**: include a finding only when **both** conditions hold:
+- Confidence is **YES**.
+- The sink type is testable without external I/O or network access: SQL/NoSQL injection, weak RNG, ReDoS, hash input ambiguity, prototype pollution, CSV/formula injection.
+
+Exclude: SSRF, path traversal, command injection, XXE, open redirect, deserialization, XSS, CORS, zip-slip, uncontrolled resource allocation — these require live I/O, a running server, or filesystem state that makes a self-contained unit test unreliable.
+
+**Framework detection**: inspect the project's dependency manifests and existing test files (e.g. `pom.xml`, `build.gradle`, `package.json`, `requirements.txt`, `go.mod`, `*.test.*`, `*Test.*`, `spec/**`) to identify the test framework in use. Use the first match from this priority list:
+
+| Language | Framework (priority order) |
+|---|---|
+| Java / Kotlin | JUnit 5, JUnit 4, TestNG |
+| JavaScript / TypeScript | Jest, Mocha, Vitest |
+| Python | pytest, unittest |
+| Go | `testing` (standard library) |
+| C# | xUnit, NUnit, MSTest |
+| Ruby | RSpec, Minitest |
+| PHP | PHPUnit |
+| Rust | `#[test]` (standard library) |
+
+If no framework can be detected, default to the idiomatic built-in test mechanism for the detected language.
+
+**Output rules for the test file**:
+- All tests go into a **single** class or script; do not create one file per finding.
+- Name the file `SecurityFindingsTest-$DATE.<ext>` where `$DATE` is today's date in `YYYY-MM-DD` format and `<ext>` matches the project language.
+- Each test method is named after its finding identifier and sink type, e.g. `test_finding_3_sqli` / `testFinding3Sqli`.
+- Each test must contain a header comment block with the following fields, so the test file and the markdown report cross-reference each other:
+  - `Finding`: the finding identifier number (e.g. `3`).
+  - `Report`: the filename of the markdown findings file generated in the same run (e.g. `Findings-2026-08-12.md`).
+  - `Location`: the processing location from the finding (e.g. `src/dao/UserDao.java:87`).
+  - `Category`: the sink type / CWE (e.g. `SQL injection — CWE-89`).
+  Use the comment syntax of the target language (`//`, `#`, `--`, etc.). Keep the block compact — four lines maximum.
+- Each test asserts the **vulnerable behavior** — it must **pass** (green) on the unpatched code, confirming the issue is present. Do not assert the fixed behavior; the test's purpose is detection, not regression.
+- Keep tests minimal and self-contained: inline all fixtures, avoid shared state between tests, import only what the framework provides plus the class under test.
+- If no eligible findings exist, skip the file and note this in the console output.
