@@ -115,6 +115,12 @@ agent's rules need to be updated or a new version of the upstream skill is avail
 
 ## Inline detection guidance for file types without a dedicated agent
 
+**Design principle — when to add an agent vs. inline guidance**:
+- Add a **dedicated agent** when the model does not reliably detect the vulnerability class
+  at all — foundational knowledge is missing and inline hints are insufficient.
+- Add **inline guidance here** when the model knows the vulnerability class but consistently
+  misses a specific pattern or sub-case — a focused rule is enough to close the gap.
+
 When no dedicated agent exists for a file type encountered during Step 2, apply your general
 knowledge and the rules in `.claude/skills/codebase-hotspotsv2/shared-rules.md`. For the file types listed below, also apply
 the additional checks described here — these are non-obvious patterns that model knowledge

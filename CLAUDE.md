@@ -14,6 +14,7 @@ All skills live in `.claude/skills/<skill-name>/SKILL.md`. They use Claude Code'
 | --- | --- | --- |
 | `codebase-overview` | `/codebase-overview [path]` | Generates a Mermaid flowchart mapping entry points → landing points (custom code or third-party libs), colored by risk tier |
 | `codebase-hotspotsv1` | `/codebase-hotspotsv1 [path]` | Taint-traces each entry point to risky sinks; outputs a structured findings report saved as `Findings-YYYY-MM-DD.md` and a companion test file `SecurityFindingsTest-YYYY-MM-DD.<ext>` |
+| `codebase-hotspotsv2` | `/codebase-hotspotsv2 [path]` | Evolution of v1: spawns dedicated agents per vulnerability class to enforce complete, class-specific detection rules that a general model tends to miss or apply inconsistently; same output format as v1 |
 | `codebase-semgrep-findings-review` | `/codebase-semgrep-findings-review <sarif-or-json> [source-root] [CONFIRMED\|PARTIAL]` | Reads a Semgrep SARIF/JSON output, applies semantic reasoning to each finding, and saves a filtered report as `Semgrep-Review-YYYY-MM-DD.md` |
 
 ## Recommended review workflow
@@ -23,7 +24,7 @@ Apply these steps **at the root of the codebase under review**, starting a fresh
 1. Run `/codebase-overview` for a global visual map of risky sinks.
 2. Scan the codebase with Semgrep (via [toolbox-codescan](https://github.com/righettod/toolbox-codescan)).
 3. Run `/codebase-semgrep-findings-review` on the Semgrep output to filter false positives.
-4. Run `/codebase-hotspotsv1` to trace entry-point → sink paths.
+4. Run `/codebase-hotspotsv2` (preferred) or `/codebase-hotspotsv1` to trace entry-point → sink paths.
 5. Manually validate the combined output of steps 3 and 4.
 
 A **module-by-module** approach is recommended for large codebases — run steps 2–5 per module from that module's root folder.
@@ -44,3 +45,8 @@ irm https://raw.githubusercontent.com/righettod/toolbox-ai-assisted-secure-code-
 - Mermaid diagrams must pass the validation checklist in `codebase-overview/SKILL.md` before being emitted (unique IDs, quoted labels, no bare `-->` inside labels, node count ≤ 40).
 - Risk coloring: `classDef high fill:#fdd,stroke:#c00,color:#900` (red) for code-execution/direct-compromise sinks; `classDef med fill:#ffe9c7,stroke:#e08e00` (amber) for auth/crypto/session sinks.
 - `codebase-hotspotsv1` generates a companion test file (`SecurityFindingsTest-YYYY-MM-DD.<ext>`) alongside the markdown report. Only Confidence: YES findings with self-contained sink types (SQL injection, weak RNG, ReDoS, hash input ambiguity, prototype pollution, CSV injection) get a test. Each test method carries a header comment cross-referencing its finding number, the markdown report filename, the source location, and the CWE — so the two artifacts are mutually traceable. Tests assert the **vulnerable behavior** (green on unpatched code).
+- `codebase-hotspotsv2` uses a two-tier detection architecture:
+  - **Dedicated agents** (`.claude/skills/codebase-hotspotsv2/agent-*/SKILL.md`) — spawned via `TaskCreate` for vulnerability classes the model does not reliably detect on its own (ReDoS, hash input ambiguity, log forging/viewer XSS, archive decompression, open redirect, CSV injection, email validation, image validation, PDF validation). Each agent enforces a complete, class-specific rule set.
+  - **Inline detection guidance** (in the orchestrator `SKILL.md`) — applied directly by the orchestrator for classes the model knows but where specific sub-cases are consistently missed (DOCX DDE/OLE, XLSX macros/connections/external links).
+  - The shared output contract (Confidence, Severity, finding format) lives in `.claude/skills/codebase-hotspotsv2/shared-rules.md` and is referenced by all agents and the orchestrator.
+  - When adding a new weakness: create a dedicated agent if the model lacks foundational knowledge of the class; add inline guidance if the model knows the class but misses a specific pattern.
