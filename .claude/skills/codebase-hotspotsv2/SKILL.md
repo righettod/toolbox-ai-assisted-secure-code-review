@@ -17,7 +17,7 @@ If an argument is provided in `$ARGUMENTS`, restrict the analysis to that entry 
 * **Source**: Is the entry point form which the information start is journey into the codebase.
 * **Sink**: Is the final location where the information is processed or exit the codebase.
 * **Data validation**: Input information is considered **validated** when there is **effective** check for the specific sink it reaches. The **effectiveness** is described in the section **effective validation reference** of the file  `.claude/skills/codebase-hotspotsv2/shared-rules.md`.
-* **Risky processing**: A risky processing is a processing that uses the information to perform any of the actions listed in the **`Risky processing`** section of this file, without performing *data validation* against the information prior to use.
+* **Risky processing**: A risky processing is a processing that uses the information to perform any of the actions listed in the **`Risky processing`** section of the file `.claude/skills/codebase-hotspotsv2/agent-generic/SKILL.md`, without performing *data validation* against the information prior to use.
 
 ## Methodology
 
@@ -38,7 +38,7 @@ You must follow all these steps in the defined sequence order.
     1. Instruct the subagent to read the agent SKILL.md: `"Read the file .claude/skills/codebase-hotspotsv2/<agent-path>/SKILL.md and apply its instructions to the following source code."` (replace `<agent-path>` with the path from the registry).
     2. Append the full source code of every function involved in the taint path from source to sink.
     3. Declare: `"You may use: Read, Glob, Grep."`.
-  * If no dedicated agent is available then you use your knowledge to identify if the processing performed is risky from a security perspective based on the **`Risky processing`** section of this file and produce **the same output format defined in the `Output rules` section of `.claude/skills/codebase-hotspotsv2/shared-rules.md`**.
+  * If no dedicated agent is available, spawn the generic agent (`agent-generic/`) via `TaskCreate` using the same 3-point prompt template, replacing `<agent-path>` with `agent-generic/`. Do not analyse the sink inline — always delegate to the generic agent so all analysis runs in parallel.
 * An agent goal is to identify, based on the source code provided in its prompt, every risky processing performed from a security perspective.
 * An agent output format is defined in the section `Output rules` of the file `.claude/skills/codebase-hotspotsv2/shared-rules.md`.
 
@@ -130,109 +130,8 @@ agent's rules need to be updated or a new version of the upstream skill is avail
 | `agent-email-validation/` | Insufficient email address validation — missing RFC parsing, encoded-word/comment/Punycode/UUCP/address-literal/source-route/percent-hack rejection, length limits, CRLF prevention, single-label domain rejection, quoted local-part rejection | [secure-email-validation](https://raw.githubusercontent.com/righettod/code-assistant-skills-security-utils/refs/heads/main/.claude/skills/secure-email-validation/SKILL.md) |
 | `agent-image-validation/` | Insufficient image file validation — missing magic-number type verification, trailing-content (polyglot/concatenation) detection, and pixel stripping | [secure-image-validation](https://raw.githubusercontent.com/righettod/code-assistant-skills-security-utils/refs/heads/main/.claude/skills/secure-image-validation/SKILL.md) |
 | `agent-pdf-validation/` | Insufficient PDF file validation — missing magic-number verification, file size limit, embedded attachment detection, XFA form detection, JavaScript detection across all four document locations, forbidden action detection (Launch/GoToR/ImportData) with recursive Next-chain traversal, and trailing-content detection after the final %%EOF | [secure-pdf-validation](https://raw.githubusercontent.com/righettod/code-assistant-skills-security-utils/refs/heads/main/.claude/skills/secure-pdf-validation/SKILL.md) |
+| `agent-docx-validation/` | Insufficient Microsoft Word / DOCX file validation — DDE field injection detection and OLE/ActiveX embedded object detection (ZIP-level checks delegated to agent-archive-decompression) | [secure-microsoft-word-validation](https://raw.githubusercontent.com/righettod/code-assistant-skills-security-utils/refs/heads/main/.claude/skills/secure-microsoft-word-validation/SKILL.md) |
+| `agent-xlsx-validation/` | Insufficient Microsoft Excel / XLSX file validation — VBA macro detection, OLE/ActiveX embedded object detection, external data connection detection, and external workbook link detection (ZIP-level checks delegated to agent-archive-decompression) | [secure-microsoft-excel-validation](https://raw.githubusercontent.com/righettod/code-assistant-skills-security-utils/refs/heads/main/.claude/skills/secure-microsoft-excel-validation/SKILL.md) |
+| `agent-generic/` | Fallback for all sink types not covered by a dedicated agent above — XXE, SSRF, XSS, command injection, SQL/NoSQL/ORM/LDAP/XPath/GraphQL injection, path traversal, authentication bypass, authorization bypass / IDOR, CORS bypass, server-side template injection, code injection, insecure deserialization, prototype pollution, weak RNG, uncontrolled resource allocation | Internal |
 
-## Inline detection guidance for file types without a dedicated agent
 
-**Design principle — when to add an agent vs. inline guidance**:
-- Add a **dedicated agent** when the model does not reliably detect the vulnerability class
-  at all — foundational knowledge is missing and inline hints are insufficient.
-- Add **inline guidance here** when the model knows the vulnerability class but consistently
-  misses a specific pattern or sub-case — a focused rule is enough to close the gap.
-
-When no dedicated agent exists for a file type encountered during Step 2, apply your general
-knowledge and the rules in `.claude/skills/codebase-hotspotsv2/shared-rules.md`. For the file types listed below, also apply
-the additional checks described here — these are non-obvious patterns that model knowledge
-alone tends to miss.
-
-### Microsoft Word / DOCX files
-
-DOCX is a ZIP archive containing XML parts. When user-supplied DOCX files are processed
-without a dedicated agent, apply the archive decompression agent (`agent-archive-decompression/`)
-for ZIP-level checks (size limits, zip-slip, zip-bomb), then additionally check for the
-following two Word-specific risky patterns that models consistently miss:
-
-**DDE field injection** (CWE-20, severity MEDIUM):
-- Open the `word/document.xml` part inside the ZIP.
-- Scan its content for the strings `DDEAUTO` or ` DDE ` (with surrounding whitespace, to
-  avoid matching unrelated substrings).
-- A match means the document contains a Dynamic Data Exchange field that executes an
-  arbitrary system command when opened in Microsoft Word with field updates enabled.
-- Report as a finding if the uploaded file is stored or forwarded without this scan.
-- Effective guard: reject the file if either string is found; no sanitisation alternative exists.
-
-**OLE / ActiveX embedded objects** (CWE-434, severity HIGH):
-- Open the `word/_rels/document.xml.rels` relationship file inside the ZIP.
-- Scan for relationship entries whose `Type` URI contains `oleObject` or `control`
-  (case-insensitive). Example:
-  `Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject"`
-- A match means the document embeds an OLE object or ActiveX control that can execute
-  arbitrary code when the document is opened.
-- Report as a finding if the uploaded file is stored or forwarded without this scan.
-- Effective guard: reject the file if any such relationship is found.
-
-Source: [secure-microsoft-word-validation](https://raw.githubusercontent.com/righettod/code-assistant-skills-security-utils/refs/heads/main/.claude/skills/secure-microsoft-word-validation/SKILL.md)
-
-### Microsoft Excel / XLSX files
-
-XLSX is a ZIP archive containing XML parts (Office Open XML). When user-supplied XLSX files
-are processed without a dedicated agent, apply the archive decompression agent
-(`agent-archive-decompression/`) for ZIP-level checks (size limits, zip-slip, zip-bomb),
-then additionally check for the following three Excel-specific risky patterns that models
-consistently miss:
-
-**VBA macro detection** (CWE-434, severity HIGH):
-- Scan the ZIP entry list for the presence of `vbaProject.bin`.
-- A match means the workbook contains compiled VBA macros that execute arbitrary code when
-  the file is opened with macros enabled.
-- Report as a finding if the uploaded file is stored or forwarded without this scan.
-- Effective guard: reject the file if `vbaProject.bin` is present; no sanitisation alternative exists.
-
-**External data connections** (CWE-611 / SSRF-adjacent, severity MEDIUM):
-- Scan the ZIP entry list for the presence of `xl/connections.xml`.
-- A match means the workbook contains external data connection definitions (database queries,
-  web queries, OData feeds) that may trigger outbound network requests or credential exposure
-  when the file is opened.
-- Report as a finding if the uploaded file is stored or forwarded without this scan.
-- Effective guard: reject the file if `xl/connections.xml` is present.
-
-**External workbook links** (CWE-20, severity MEDIUM):
-- Scan the ZIP entry list for any entry whose path begins with `xl/externalLinks/`.
-- A match means the workbook references external workbook files. These links can point to
-  attacker-controlled UNC paths (`\\attacker\share\file.xlsx`), triggering NTLM credential
-  capture when the file is opened on Windows, or can be used to exfiltrate data via formula
-  evaluation against a remote workbook.
-- Report as a finding if the uploaded file is stored or forwarded without this scan.
-- Effective guard: reject the file if any `xl/externalLinks/` entry is present.
-
-Note: OLE/ActiveX embedded objects use the same detection pattern as DOCX — scan the
-relationship file `xl/_rels/workbook.xml.rels` for `Type` URIs containing `oleObject` or
-`control` (case-insensitive), severity HIGH (CWE-434).
-
-Source: [secure-microsoft-excel-validation](https://raw.githubusercontent.com/righettod/code-assistant-skills-security-utils/refs/heads/main/.claude/skills/secure-microsoft-excel-validation/SKILL.md)
-
-## Risky processing
-
-The following processing must be considered **risky** from a security perspective. Use this
-list during Step 2 when no dedicated agent is available for the sink type detected.
-
-- Input information not validated and used within an XML/XSD parser (XXE).
-- Input information not validated and used to create a message written into a logging function (log injection/forging).
-- Input information not validated and used to perform a network request (SSRF, including DNS-rebinding and redirect-based variants).
-- Input information not validated and used to create an HTTP response (response splitting, header injection, open redirect via `Location`/`Set-Cookie`).
-- Input information not validated and used to render HTML or write to the DOM — `innerHTML`, `document.write`, `dangerouslySetInnerHTML`, unescaped template output, or equivalent — (XSS).
-- Input information not validated and used to generate Comma-Separated Values (CSV) content (CSV/formula injection).
-- Input information not validated and used for authentication decisions (authentication bypass).
-- Input information not validated and used for authorization decisions (including IDOR / object reference, mass assignment / object binding).
-- Input information not validated and used for Cross-Origin Resource Sharing (CORS) decisions (CORS validation bypass).
-- Input information not validated and used to decompress an archive (zip-slip, decompression bomb).
-- Input information not validated and used to access a filesystem (path traversal, file upload with input-controlled filename/extension/content-type).
-- Input information not validated and used for a shell or process execution (command injection, tainted format string).
-- Input information not validated and used to create a regular expression that is evaluated (ReDoS).
-- Input information not validated and used to construct a SQL/NoSQL/ORM/LDAP/XPath/GraphQL query (injection).
-- Input information not validated and used in a template engine (server-side template injection).
-- Input information not validated and passed to a dynamic code evaluation function such as `eval()`, `Function()`, `exec()`, `compile()`, or equivalent (code injection).
-- Input information not validated and used for a deserialization processing using another format than JSON (insecure deserialization).
-- Input information not validated and used to merge into or assign properties of an object in a way that can overwrite inherited properties such as `__proto__`, `constructor`, or `prototype` — e.g. `_.merge`, `Object.assign`, recursive merge with user-controlled keys — (prototype pollution).
-- Input information not validated and used to generate random values for a security-sensitive purpose (weak RNG, e.g. a predictable or input-derived seed, or a non-CSPRNG such as `Math.random`).
-- Input information not validated and used to compute a cryptographic digest without a values separator (hash input ambiguity).
-- Input information not validated and used to control a resource allocation size, loop iteration count, or similar bound — resulting in memory exhaustion, CPU exhaustion, or excessive I/O — (uncontrolled resource allocation / DoS).
