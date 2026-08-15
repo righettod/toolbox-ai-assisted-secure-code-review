@@ -164,20 +164,23 @@ When Confidence is YES, provide one PoC block per finding type.
 ```
 Missing check : magic number verification
 Sink          : Files.write(uploadPath, fileBytes)
-Payload       : Upload a file named "shell.jpg" containing PHP code with no JPEG magic bytes.
-                The extension check passes; the file is stored and executable at its URL.
-Attack        : GET /uploads/shell.jpg triggers PHP execution → RCE.
+Payload       : Upload a server-side script file (e.g. a script in the language handled
+                by the web server) renamed with a .jpg extension and no image magic bytes.
+                The extension check passes; the file is stored and served by the web server.
+Attack        : An HTTP request to the stored file URL causes the web server to execute
+                the script → RCE.
 ```
 
 **Check 2 PoC**:
 ```
 Missing check : trailing content detection
 Sink          : ImageIO.read(inputStream) returns non-null → file stored
-Payload       : Craft a valid PNG (magic bytes + valid IEND chunk) followed by:
-                a PHP webshell one-liner that reads a shell command from a GET parameter
-                and passes it to system() — appended as plain text after the IEND chunk.
-                ImageIO.read() succeeds (stops at IEND); trailing PHP is stored intact.
-Attack        : GET /uploads/image.php?cmd=id triggers PHP execution → RCE.
+Payload       : Craft a valid PNG (magic bytes + valid IEND chunk) followed by a
+                server-side script payload appended as plain text after the IEND chunk.
+                The image library succeeds (stops at IEND); the appended script is
+                stored intact as part of the file.
+Attack        : An HTTP request to the stored file URL causes the web server to execute
+                the appended script → RCE.
 ```
 
 **Check 3 PoC**:
