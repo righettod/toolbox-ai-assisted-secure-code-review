@@ -53,18 +53,25 @@ You must follow all these steps in the defined sequence order.
   * **Format each finding** using the structure defined in the `Output rules` section of `.claude/skills/codebase-hotspotsv2/shared-rules.md`.
 * Save the assembled output to a file named `Findings-$DATE.md` where `$DATE` is today's date in `YYYY-MM-DD` format, written to the current working directory using the `Write` tool.
 
-### Step 4: Generation of the test class or script
+### Step 4: Generation of the sandbox validation script
 
-Using the findings collected in Step 3, generate a single test class or script that contains one test per eligible finding, then save it to the current working directory.
+Using the findings collected in Step 3, generate a single sandbox script or test class that
+contains one test per finding with Confidence **YES** or **PARTIAL**, then save it to the
+current working directory.
 
-**Eligibility rule**: include a finding only when **both** conditions hold:
+**Purpose**: the generated file is a **manual validation sandbox**, not an automated CI
+test. Its goal is to let the reviewer reproduce the vulnerable condition, observe the
+behaviour, and confirm exploitability by running the code locally. Tests do not need to be
+self-contained or free of external I/O — they should be as realistic as needed to demonstrate
+the finding.
 
-- Confidence is **YES**.
-- The sink type is testable without external I/O or network access: SQL/NoSQL injection, weak RNG, ReDoS, hash input ambiguity, prototype pollution, CSV/formula injection.
+**Eligibility rule**: include every finding where Confidence is **YES** or **PARTIAL**.
+Exclude only findings where Confidence is **NO**.
 
-Exclude: SSRF, path traversal, command injection, XXE, open redirect, deserialization, XSS, CORS, zip-slip, uncontrolled resource allocation — these require live I/O, a running server, or filesystem state that makes a self-contained unit test unreliable.
-
-**Framework detection**: inspect the project's dependency manifests and existing test files (e.g. `pom.xml`, `build.gradle`, `package.json`, `requirements.txt`, `go.mod`, `*.test.*`, `*Test.*`, `spec/**`) to identify the test framework in use. Use the first match from this priority list:
+**Framework detection**: inspect the project's dependency manifests and existing test files
+(e.g. `pom.xml`, `build.gradle`, `package.json`, `requirements.txt`, `go.mod`, `*.test.*`,
+`*Test.*`, `spec/**`) to identify the test framework in use. Use the first match from this
+priority list:
 
 | Language | Framework (priority order) |
 | --- | --- |
@@ -77,22 +84,33 @@ Exclude: SSRF, path traversal, command injection, XXE, open redirect, deserializ
 | PHP | PHPUnit |
 | Rust | `#[test]` (standard library) |
 
-If no framework can be detected, default to the idiomatic built-in test mechanism for the detected language.
+If no framework can be detected, default to the idiomatic built-in test mechanism for the
+detected language.
 
-**Output rules for the test file**:
+**Output rules for the sandbox file**:
 
 - All tests go into a **single** class or script; do not create one file per finding.
-- Name the file `SecurityFindingsTest-$DATE.<ext>` where `$DATE` is today's date in `YYYY-MM-DD` format and `<ext>` matches the project language.
-- Each test method is named after its finding identifier and sink type, e.g. `test_finding_3_sqli` / `testFinding3Sqli`.
-- Each test must contain a header comment block with the following fields, so the test file and the markdown report cross-reference each other:
+- Name the file `SecurityFindingsTest-$DATE.<ext>` where `$DATE` is today's date in
+  `YYYY-MM-DD` format and `<ext>` matches the project language.
+- Each test method is named after its finding identifier and sink type,
+  e.g. `test_finding_3_sqli` / `testFinding3Sqli`.
+- Each test must contain a header comment block with the following fields, so the sandbox
+  file and the markdown report cross-reference each other:
   - `Finding`: the finding identifier number (e.g. `3`).
-  - `Report`: the filename of the markdown findings file generated in the same run (e.g. `Findings-2026-08-12.md`).
+  - `Report`: the filename of the markdown findings file generated in the same run
+    (e.g. `Findings-2026-08-12.md`).
   - `Location`: the processing location from the finding (e.g. `src/dao/UserDao.java:87`).
   - `Category`: the sink type / CWE (e.g. `SQL injection — CWE-89`).
-  Use the comment syntax of the target language (`//`, `#`, `--`, etc.). Keep the block compact — four lines maximum.
-- Each test asserts the **vulnerable behavior** — it must **pass** (green) on the unpatched code, confirming the issue is present. Do not assert the fixed behavior; the test's purpose is detection, not regression.
-- Keep tests minimal and self-contained: inline all fixtures, avoid shared state between tests, import only what the framework provides plus the class under test.
-- If no eligible findings exist, skip the file and note this in the console output.
+  Use the comment syntax of the target language (`//`, `#`, `--`, etc.). Keep the block
+  compact — four lines maximum.
+- Each test reproduces the **vulnerable behaviour** on the unpatched code, confirming the
+  condition is present and observable. For findings that require external state (a running
+  server, a file, a database, a network endpoint), include the setup steps as inline
+  comments or `@BeforeEach` / fixture blocks so the reviewer knows exactly what to
+  prepare before running the test.
+- For Confidence **PARTIAL** findings, add a comment flagging the uncertainty:
+  `// PARTIAL — manual inspection required: <reason from finding>`.
+- Keep each test focused on a single finding; avoid shared state between tests.
 
 ## Dedicated agents registry
 
