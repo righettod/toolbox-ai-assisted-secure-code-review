@@ -174,7 +174,8 @@ Attack        : GET /uploads/shell.jpg triggers PHP execution → RCE.
 Missing check : trailing content detection
 Sink          : ImageIO.read(inputStream) returns non-null → file stored
 Payload       : Craft a valid PNG (magic bytes + valid IEND chunk) followed by:
-                "<?php system($_GET['cmd']); ?>"
+                a PHP webshell one-liner that reads a shell command from a GET parameter
+                and passes it to system() — appended as plain text after the IEND chunk.
                 ImageIO.read() succeeds (stops at IEND); trailing PHP is stored intact.
 Attack        : GET /uploads/image.php?cmd=id triggers PHP execution → RCE.
 ```
