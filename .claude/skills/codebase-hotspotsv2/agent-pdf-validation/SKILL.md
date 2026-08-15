@@ -241,10 +241,11 @@ Effect        : The GoTo passes the first-action check; GoToR in the Next chain 
 ```
 Missing check : trailing content after final %%EOF (Check 7)
 Sink          : file write of upload bytes after magic-number-only validation
-Payload       : Valid PDF ending with %%EOF followed by:
-                "<?php system($_GET['cmd']); ?>"
-Effect        : If stored in a web-accessible directory with PHP execution enabled, the
-                appended code is executed on any HTTP request to the stored file path.
+Payload       : Valid PDF ending with %%EOF followed by a server-side script payload
+                appended as plain text after the final marker.
+Effect        : If stored in a web-accessible directory with server-side script execution
+                enabled, the appended code is executed on any HTTP request to the stored
+                file path.
 ```
 
 ## Output
