@@ -2,15 +2,52 @@
 
 # Description
 
-> 🗃️ All *commands* are created as **skills** (Claude Code proprietary format, new format for the **commands**) and are stored into this [folder](.claude/skills).
+> 🗃️ All *skills* (Claude Code proprietary format, stored as `SKILL.md` files and invoked as slash commands) are stored into this [folder](.claude/skills).
 
-🧑‍💻 This folder contains coding assistant *commands* that I use to perform a secure code review.
+🧑‍💻 This folder contains coding assistant *skills* that I use to perform a secure code review.
 
 🔬 The idea is to:
 
 1. Learn how to leverage AI, via a coding assistant (claude code here), in the context of a secure code review activity.
 2. Define a process to perform a secure code review with the help of AI via a coding assistant.
 3. Allow me to learn how to create instructions for a coding assistant to help me during an secure code review activity.
+
+# Toolbox usage approach
+
+```mermaid
+sequenceDiagram
+    actor Me as Dom
+    participant R1 as code-snippets-security-utils
+    participant R2 as code-assistant-skills-security-utils
+    participant R3 as toolbox-ai-assisted-secure-code-review
+
+    Me->>Me: Find an weakness during<br/>a secure code review.
+    alt Remediation not documented<br/>into the repository
+        Me->>R1: Search, test, and create a new code snippet<br/>with a remediation proposal.
+        R1->>Me: Test and publising OK.
+    end
+    alt Skill do not exists<br/>into the repository<br/>"code-assistant-skills-security-utils"
+        Me->>R2: Use the test work done to create the corresponding skill<br/>to generate code that prevent the weakness by default.
+        R2->>Me: Test and publising OK.
+    end
+    alt New skill created in repository<br/>"code-assistant-skills-security-utils"
+        Me->>R3: Look to create, if relevant, a new dedicated agent using<br/>the content of the new skill created<br/>to detect the corresponding weakness.
+        R3->>Me: Test and publising OK.
+    end        
+    alt Weakness not detected by the skill "codebase-hotspotsv2"<br/>so manually identified
+        Me->>R3: Update the skill to detect the weakness.
+        R3->>Me: Test and publising OK.
+        Me->>R1: Create a code snippet for the corresponding remediation.
+        R1->>Me: Test and publising OK.
+        Me->>R2: Create a skill for the corresponding weakness.
+        R2->>Me: Test and publising OK.
+    end
+```
+
+📦 Related GitHub repositories:
+
+* [code-assistant-skills-security-utils](https://github.com/righettod/code-assistant-skills-security-utils).
+* [code-snippets-security-utils](https://github.com/righettod/code-snippets-security-utils).
 
 # Review process
 
@@ -19,15 +56,15 @@
 🧑‍💻 Intital steps into a claude code session **at the root folder of the codebase**:
 
 1. Start a new claude code session: *Important to isolate the processing from a context perspective*.
-2. Call the command [`codebase-overview`](#case-1-codebase-overview) to have a global visual overview of the risky sinks.
+2. Invoke the skill [`/codebase-overview`](#case-1-codebase-overview) to have a global visual overview of the risky sinks.
 
 🧑‍💻 For each module of the codebase into a claude code session **at the root folder of the module**, apply these steps:
 
 1. Scan the code with [SemGrep](https://github.com/semgrep/semgrep) to identify issues using a pattern-based approach: Goal is to identify issues not linked to a entry point, like for example, a deprecated algorithm used but not called from an entry point.
 2. Start a new claude code session: *Important to isolate the processing from a context perspective*.
-3. Call the command [`codebase-semgrep-findings-review`](#case-3-review-the-semgrep-scan-of-the-codebase) to filter false positive findings from the SemGrep scan results.
+3. Invoke the skill [`/codebase-semgrep-findings-review`](#case-3-review-the-semgrep-scan-of-the-codebase) to filter false positive findings from the SemGrep scan results.
 4. Start a new claude code session: *Important to isolate the processing from a context perspective*.
-5. Call the command [`codebase-hotspots`](#case-2-codebase-hotspots) to identify entry point that leads to risk processing from a security perspective.
+5. Invoke the skill [`/codebase-hotspotsv1`](#case-2-codebase-hotspots) to identify entry point that leads to risk processing from a security perspective.
 6. Review and manually validate the result of step **3** + step **5**.
 
 ⚠️ Important notes:
@@ -46,7 +83,7 @@ A visual overview of the information entry points and where the information land
 and if such processing can be risky from a security perspective.
 ```
 
-📦 User prompt is stored, as `claude code command`, into the file in the folder `.claude/skills/codebase-overview/` ([ref](.claude/skills/codebase-overview/SKILL.md)).
+📦 User prompt is stored, as a `claude code skill`, into the file in the folder `.claude/skills/codebase-overview/` ([ref](.claude/skills/codebase-overview/SKILL.md)).
 
 🤖 Use it via this instruction inside a claude code session: `/codebase-overview [RELATIVE_PATH_TO_CODEBASE]`.
 
@@ -58,7 +95,7 @@ and if such processing can be risky from a security perspective.
 * **Rectangle** form represents a custom code *landing* points with a TAG to indicate the type of processing performed and colored if such processing can be risky from a security perspective.
 * **Circle** form represents a third-party library *landing* points and colored if processing performed can be risky from a security perspective.
 
-ℹ️ Node label naming conventions is defined into the section **[Output rules](.claude/skills/codebase-overview/SKILL.md#output-rules)** section of the command file.
+ℹ️ Node label naming conventions is defined into the section **[Output rules](.claude/skills/codebase-overview/SKILL.md#output-rules)** section of the skill file.
 
 🔬 Example of generated schema against the source code of [OWASP WebGoat](https://github.com/WebGoat/WebGoat) using the download of a zip archive of the *main* branch:
 
@@ -159,17 +196,20 @@ flowchart LR
 
 ## Case 2: Codebase hotspots
 
+> [!TIP]
+> The skill `/codebase-hotspotsv2` ([ref](.claude/skills/codebase-hotspotsv2/SKILL.md)) is an evolution of v1 that spawns dedicated agents per vulnerability class to enforce complete, class-specific detection rules that a general model tends to miss or apply inconsistently.
+
 🤔 In this case, the context is that I received a codebase and I want to use claude code to give point to code that does risky processing from a security perspective (called **hotspot*).
 
-📦 User prompt is stored, as `claude code command`, into the file in the folder `.claude/skills/codebase-hotspots/` ([ref](.claude/skills/codebase-hotspots/SKILL.md)).
+📦 User prompt is stored, as a `claude code skill`, into the file in the folder `.claude/skills/codebase-hotspotsv1/` ([ref](.claude/skills/codebase-hotspotsv1/SKILL.md)).
 
-🤖 Use it via this instruction inside a claude code session: `/codebase-hotspots [RELATIVE_PATH_TO_CODEBASE]`.
+🤖 Use it via this instruction inside a claude code session: `/codebase-hotspotsv1 [RELATIVE_PATH_TO_CODEBASE]`.
 
 ## Case 3: Review the SemGrep scan of the codebase
 
 🤔 In this case, I scanned the codebase with SemGrep to identify issues not linked to a entry point, like for example, a deprecated algorithm used but not called from an entry point.
 
-📦 User prompt is stored, as `claude code command`, into the file in the folder `.claude/skills/codebase-semgrep-findings-review/` ([ref](.claude/skills/codebase-semgrep-findings-review/SKILL.md)).
+📦 User prompt is stored, as a `claude code skill`, into the file in the folder `.claude/skills/codebase-semgrep-findings-review/` ([ref](.claude/skills/codebase-semgrep-findings-review/SKILL.md)).
 
 🤖 Use it via this instruction inside a claude code session: `/codebase-semgrep-findings-review [PATH_TO_SEMGREP_REPORT] [RELATIVE_PATH_TO_CODEBASE] [MINIMUM_CONFIDENCE_LEVEL]`.
 
@@ -185,7 +225,7 @@ flowchart LR
 
 # Install
 
-🧑‍💻 Copy the folder [.claude/skills](.claude/skills/) into the folder `.claude` of the project to review and use *commands* from a claude code session.
+🧑‍💻 Copy the folder [.claude/skills](.claude/skills/) into the folder `.claude` of the project to review and use *skills* from a claude code session.
 
 💡 The script [install.ps1](install.ps1) can be used too:
 
