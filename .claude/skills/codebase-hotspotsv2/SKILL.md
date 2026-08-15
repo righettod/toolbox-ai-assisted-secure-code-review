@@ -148,6 +148,44 @@ following two Word-specific risky patterns that models consistently miss:
 
 Source: [secure-microsoft-word-validation](https://raw.githubusercontent.com/righettod/code-assistant-skills-security-utils/refs/heads/main/.claude/skills/secure-microsoft-word-validation/SKILL.md)
 
+### Microsoft Excel / XLSX files
+
+XLSX is a ZIP archive containing XML parts (Office Open XML). When user-supplied XLSX files
+are processed without a dedicated agent, apply the archive decompression agent
+(`agent-archive-decompression/`) for ZIP-level checks (size limits, zip-slip, zip-bomb),
+then additionally check for the following three Excel-specific risky patterns that models
+consistently miss:
+
+**VBA macro detection** (CWE-434, severity HIGH):
+- Scan the ZIP entry list for the presence of `vbaProject.bin`.
+- A match means the workbook contains compiled VBA macros that execute arbitrary code when
+  the file is opened with macros enabled.
+- Report as a finding if the uploaded file is stored or forwarded without this scan.
+- Effective guard: reject the file if `vbaProject.bin` is present; no sanitisation alternative exists.
+
+**External data connections** (CWE-611 / SSRF-adjacent, severity MEDIUM):
+- Scan the ZIP entry list for the presence of `xl/connections.xml`.
+- A match means the workbook contains external data connection definitions (database queries,
+  web queries, OData feeds) that may trigger outbound network requests or credential exposure
+  when the file is opened.
+- Report as a finding if the uploaded file is stored or forwarded without this scan.
+- Effective guard: reject the file if `xl/connections.xml` is present.
+
+**External workbook links** (CWE-20, severity MEDIUM):
+- Scan the ZIP entry list for any entry whose path begins with `xl/externalLinks/`.
+- A match means the workbook references external workbook files. These links can point to
+  attacker-controlled UNC paths (`\\attacker\share\file.xlsx`), triggering NTLM credential
+  capture when the file is opened on Windows, or can be used to exfiltrate data via formula
+  evaluation against a remote workbook.
+- Report as a finding if the uploaded file is stored or forwarded without this scan.
+- Effective guard: reject the file if any `xl/externalLinks/` entry is present.
+
+Note: OLE/ActiveX embedded objects use the same detection pattern as DOCX — scan the
+relationship file `xl/_rels/workbook.xml.rels` for `Type` URIs containing `oleObject` or
+`control` (case-insensitive), severity HIGH (CWE-434).
+
+Source: [secure-microsoft-excel-validation](https://raw.githubusercontent.com/righettod/code-assistant-skills-security-utils/refs/heads/main/.claude/skills/secure-microsoft-excel-validation/SKILL.md)
+
 ## Risky processing
 
 The following processing must be considered **risky** from a security perspective. Use this
