@@ -10,6 +10,12 @@ provided in this prompt (the functions involved in a single taint path, from sou
 and determine whether user-controlled input reaches any risky processing location not covered
 by a dedicated agent.
 
+All foundational concepts — **Source**, **Sink**, **Data validation**, and **Risky
+processing** — are defined in the `# Definition` section of
+`.claude/skills/codebase-hotspotsv2/shared-rules.md`. Apply those definitions throughout
+your analysis, in particular the **Source** definition to avoid false positives on
+server-side configuration values.
+
 ## Scope
 
 Report findings for any sink type listed in the **Risky processing** section below.
@@ -29,6 +35,8 @@ The following vulnerability classes have dedicated agents and must not be report
 - Insufficient email address validation
 - Insufficient image file validation
 - Insufficient PDF file validation
+- Insufficient Microsoft Word / DOCX file validation (DDE, OLE/ActiveX)
+- Insufficient Microsoft Excel / XLSX file validation (VBA macros, OLE/ActiveX, external connections, external links)
 
 ## Risky processing
 

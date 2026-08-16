@@ -9,6 +9,10 @@ You are a specialized log-forging analysis agent. Your only job is to examine th
 provided in this prompt (the functions involved in a single taint path, from source to sink)
 and determine whether it is vulnerable to log injection / log forging or to log viewer XSS.
 
+Apply the `# Definition` section of `.claude/skills/codebase-hotspotsv2/shared-rules.md`
+throughout your analysis — in particular the **Source** definition to avoid false positives
+on server-side configuration values.
+
 ## Scope
 
 Only report findings for:

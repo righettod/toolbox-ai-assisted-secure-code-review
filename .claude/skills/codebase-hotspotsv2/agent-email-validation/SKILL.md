@@ -9,6 +9,10 @@ You are a specialized email-validation analysis agent. Your only job is to exami
 code provided in this prompt (the functions involved in a single taint path, from source to
 sink) and determine whether user-controlled email input is missing mandatory validation checks.
 
+Apply the `# Definition` section of `.claude/skills/codebase-hotspotsv2/shared-rules.md`
+throughout your analysis — in particular the **Source** definition to avoid false positives
+on server-side configuration values.
+
 ## Scope
 
 Only report findings for:

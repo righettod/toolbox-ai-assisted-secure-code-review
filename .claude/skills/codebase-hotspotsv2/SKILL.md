@@ -13,17 +13,10 @@ If an argument is provided in `$ARGUMENTS`, restrict the analysis to that entry 
 
 ## Definition
 
-* **Entry point**: Is where information enters the codebase: `main()` functions, HTTP route definitions, CLI command handlers, message/queue consumers, exported public API functions.
-* **Source**: Is the user-controlled value that enters the codebase at an entry point — for
-  example an HTTP request parameter, request body field, HTTP header, path segment, CLI
-  argument, environment variable supplied at runtime by an external caller, or message/queue
-  payload. The following are **never** sources, even if they flow to a risky sink:
-  server-side configuration values (e.g. `app.config`, `application.properties`,
-  `appsettings.json`), hardcoded constants, values loaded from a secrets manager at startup,
-  and data fetched from a trusted internal store with no user influence over the fetched value.
-* **Sink**: Is the final location where the information is processed or exit the codebase.
-* **Data validation**: Input information is considered **validated** when there is **effective** check for the specific sink it reaches. The **effectiveness** is described in the section **effective validation reference** of the file  `.claude/skills/codebase-hotspotsv2/shared-rules.md`.
-* **Risky processing**: A risky processing is a processing that uses the information to perform any of the actions listed in the **`Risky processing`** section of the file `.claude/skills/codebase-hotspotsv2/agent-generic/SKILL.md`, without performing *data validation* against the information prior to use.
+All foundational concepts — **Entry point**, **Source**, **Sink**, **Data validation**,
+and **Risky processing** — are defined in the `# Definition` section of
+`.claude/skills/codebase-hotspotsv2/shared-rules.md`. Read that section before starting
+the analysis.
 
 ## Methodology
 
