@@ -51,7 +51,7 @@ You must follow all these steps in the defined sequence order.
   * **Group by entry point**: order findings by entry point, then within each group by Severity (CRITICAL first) then Confidence (YES first).
   * **Build the summary table**: count findings per entry point per severity level; include entry points with zero findings (confirming they were analysed). Follow the summary table format defined in the `Output rules` section of `.claude/skills/codebase-hotspotsv2/shared-rules.md`.
   * **Format each finding** using the structure defined in the `Output rules` section of `.claude/skills/codebase-hotspotsv2/shared-rules.md`.
-* Save the assembled output to a file named `Findings-$DATE.md` where `$DATE` is today's date in `YYYY-MM-DD` format, written to the current working directory using the `Write` tool.
+* Save the assembled output to a file named `SecurityFindings-$DATE.md` where `$DATE` is today's date in `YYYY-MM-DD` format, written to the current working directory using the `Write` tool.
 
 ### Step 4: Generation of the sandbox validation script
 
@@ -98,7 +98,7 @@ detected language.
   file and the markdown report cross-reference each other:
   - `Finding`: the finding identifier number (e.g. `3`).
   - `Report`: the filename of the markdown findings file generated in the same run
-    (e.g. `Findings-2026-08-12.md`).
+    (e.g. `SecurityFindings-2026-08-12.md`).
   - `Location`: the processing location from the finding (e.g. `src/dao/UserDao.java:87`).
   - `Category`: the sink type / CWE (e.g. `SQL injection — CWE-89`).
   Use the comment syntax of the target language (`//`, `#`, `--`, etc.). Keep the block

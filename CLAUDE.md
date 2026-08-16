@@ -13,7 +13,7 @@ All skills live in `.claude/skills/<skill-name>/SKILL.md`. They use Claude Code'
 | Skill | Invocation | Purpose |
 | --- | --- | --- |
 | `codebase-overview` | `/codebase-overview [path]` | Generates a Mermaid flowchart mapping entry points → landing points (custom code or third-party libs), colored by risk tier |
-| `codebase-hotspotsv1` | `/codebase-hotspotsv1 [path]` | Taint-traces each entry point to risky sinks; outputs a structured findings report saved as `Findings-YYYY-MM-DD.md` and a companion test file `SecurityFindingsTest-YYYY-MM-DD.<ext>` |
+| `codebase-hotspotsv1` | `/codebase-hotspotsv1 [path]` | Taint-traces each entry point to risky sinks; outputs a structured findings report saved as `SecurityFindings-YYYY-MM-DD.md` and a companion test file `SecurityFindingsTest-YYYY-MM-DD.<ext>` |
 | `codebase-hotspotsv2` | `/codebase-hotspotsv2 [path]` | Evolution of v1: spawns dedicated agents per vulnerability class to enforce complete, class-specific detection rules that a general model tends to miss or apply inconsistently; same output format as v1 |
 | `codebase-semgrep-findings-review` | `/codebase-semgrep-findings-review <sarif-or-json> [source-root] [CONFIRMED\|PARTIAL]` | Reads a Semgrep SARIF/JSON output, applies semantic reasoning to each finding, and saves a filtered report as `Semgrep-Review-YYYY-MM-DD.md` |
 

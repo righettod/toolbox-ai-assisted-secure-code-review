@@ -152,7 +152,7 @@ Then group findings by entry point. For each finding, use this structure:
 
   Keep it minimal — the goal is to confirm reachability, not to produce a working exploit.
 
-After displaying the output, determine the output filename as `Findings-$DATE.md` where `$DATE` is today's date in `YYYY-MM-DD` format, then save the full output — summary table and all individual findings — to that file in the current working directory using the Write tool.
+After displaying the output, determine the output filename as `SecurityFindings-$DATE.md` where `$DATE` is today's date in `YYYY-MM-DD` format, then save the full output — summary table and all individual findings — to that file in the current working directory using the Write tool.
 
 ## Test generation
 
@@ -185,7 +185,7 @@ If no framework can be detected, default to the idiomatic built-in test mechanis
 - Each test method is named after its finding identifier and sink type, e.g. `test_finding_3_sqli` / `testFinding3Sqli`.
 - Each test must contain a header comment block with the following fields, so the test file and the markdown report cross-reference each other:
   - `Finding`: the finding identifier number (e.g. `3`).
-  - `Report`: the filename of the markdown findings file generated in the same run (e.g. `Findings-2026-08-12.md`).
+  - `Report`: the filename of the markdown findings file generated in the same run (e.g. `SecurityFindings-2026-08-12.md`).
   - `Location`: the processing location from the finding (e.g. `src/dao/UserDao.java:87`).
   - `Category`: the sink type / CWE (e.g. `SQL injection — CWE-89`).
   Use the comment syntax of the target language (`//`, `#`, `--`, etc.). Keep the block compact — four lines maximum.
