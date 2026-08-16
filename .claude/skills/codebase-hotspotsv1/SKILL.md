@@ -11,6 +11,8 @@ The objective is to spot, for each entry point, the location in the code in whic
 
 **Entry point** is where information enters the codebase: `main()` functions, HTTP route definitions, CLI command handlers, message/queue consumers, exported public API functions.
 
+**Source** is the user-controlled value that enters the codebase at an entry point — for example an HTTP request parameter, request body field, HTTP header, path segment, CLI argument, environment variable supplied at runtime by an external caller, or message/queue payload. The following are **never** sources, even if they flow to a risky sink: server-side configuration values (e.g. `app.config`, `application.properties`, `appsettings.json`), hardcoded constants, values loaded from a secrets manager at startup, and data fetched from a trusted internal store with no user influence over the fetched value.
+
 Input information is considered **not validated** when there is no *effective* check for the specific sink it reaches. A length check or type cast is not effective validation for a path-traversal sink; an allow-list is. When you cannot determine whether validation happens upstream (middleware, decorator, framework binding, another layer you did not read), report the finding with **Confidence: PARTIAL** rather than dropping it.
 
 ## Scope
