@@ -64,7 +64,7 @@ sequenceDiagram
 2. Start a new claude code session: *Important to isolate the processing from a context perspective*.
 3. Invoke the skill [`/codebase-semgrep-findings-review`](#case-3-review-the-semgrep-scan-of-the-codebase) to filter false positive findings from the SemGrep scan results.
 4. Start a new claude code session: *Important to isolate the processing from a context perspective*.
-5. Invoke the skill [`/codebase-hotspotsv1`](#case-2-codebase-hotspots) to identify entry point that leads to risk processing from a security perspective.
+5. Invoke the skill [`/codebase-hotspotsv2`](#case-2-codebase-hotspots) to identify entry point that leads to risk processing from a security perspective.
 6. Review and manually validate the result of step **3** + step **5**.
 
 ⚠️ Important notes:
@@ -197,7 +197,7 @@ flowchart LR
 ## Case 2: Codebase hotspots
 
 > [!TIP]
-> The skill `/codebase-hotspotsv2` ([ref](.claude/skills/codebase-hotspotsv2/SKILL.md)) is an evolution of v1 that spawns dedicated agents per vulnerability class to enforce complete, class-specific detection rules that a general model tends to miss or apply inconsistently.
+> The skill `/codebase-hotspotsv2` ([ref](.claude/skills/codebase-hotspotsv2/SKILL.md)) is an evolution of v1 that spawns dedicated agents per vulnerability class to enforce complete, class-specific detection rules that a general model tends to miss or apply inconsistently. It should be privileged over the V1.
 
 🤔 In this case, the context is that I received a codebase and I want to use claude code to give point to code that does risky processing from a security perspective (called **hotspot*).
 
