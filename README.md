@@ -197,13 +197,13 @@ flowchart LR
 ## Case 2: Codebase hotspots
 
 > [!TIP]
-> The skill `/codebase-hotspotsv2` ([ref](.claude/skills/codebase-hotspotsv2/SKILL.md)) is an evolution of v1 that spawns dedicated agents per vulnerability class to enforce complete, class-specific detection rules that a general model tends to miss or apply inconsistently. It should be privileged over the V1.
+> The skill `/codebase-hotspotsv2` ([ref](.claude/skills/codebase-hotspotsv2/SKILL.md)) is an evolution of the [V1](.claude/skills/codebase-hotspotsv1/SKILL.md) that spawns dedicated agents per vulnerability class to enforce complete, class-specific detection rules that a general model tends to miss or apply inconsistently. It **must be privileged** over the V1.
 
 🤔 In this case, the context is that I received a codebase and I want to use claude code to give point to code that does risky processing from a security perspective (called **hotspot*).
 
-📦 User prompt is stored, as a `claude code skill`, into the file in the folder `.claude/skills/codebase-hotspotsv1/` ([ref](.claude/skills/codebase-hotspotsv1/SKILL.md)).
+📦 User prompt is stored, as a `claude code skill`, into the file in the folder `.claude/skills/codebase-hotspotsv2/` ([ref](.claude/skills/codebase-hotspotsv2/SKILL.md)).
 
-🤖 Use it via this instruction inside a claude code session: `/codebase-hotspotsv1 [RELATIVE_PATH_TO_CODEBASE]`.
+🤖 Use it via this instruction inside a claude code session: `/codebase-hotspotsv2 [RELATIVE_PATH_TO_CODEBASE]`.
 
 ## Case 3: Review the SemGrep scan of the codebase
 
