@@ -199,7 +199,7 @@ flowchart LR
 > [!TIP]
 > The skill `/codebase-hotspotsv2` ([ref](.claude/skills/codebase-hotspotsv2/SKILL.md)) is an evolution of the [V1](.claude/skills/codebase-hotspotsv1/SKILL.md) that spawns dedicated agents per vulnerability class to enforce complete, class-specific detection rules that a general model tends to miss or apply inconsistently. It **must be privileged** over the V1.
 
-🤔 In this case, the context is that I received a codebase and I want to use claude code to give point to code that does risky processing from a security perspective (called **hotspot*).
+🤔 In this case, the context is that I received a codebase and I want to use claude code to give point to code that does risky processing from a security perspective (called **hotspot**).
 
 📦 User prompt is stored, as a `claude code skill`, into the file in the folder `.claude/skills/codebase-hotspotsv2/` ([ref](.claude/skills/codebase-hotspotsv2/SKILL.md)).
 
