@@ -37,6 +37,7 @@ The following vulnerability classes have dedicated agents and must not be report
 - Insufficient PDF file validation
 - Insufficient Microsoft Word / DOCX file validation (DDE, OLE/ActiveX)
 - Insufficient Microsoft Excel / XLSX file validation (VBA macros, OLE/ActiveX, external connections, external links)
+- Insecure template engine usage (SSTI, template path traversal, auto-escaping disabled)
 
 ## Risky processing
 
@@ -64,7 +65,6 @@ effective.
   tainted format string).
 - Input not validated and used to construct a SQL/NoSQL/ORM/LDAP/XPath/GraphQL query
   (injection).
-- Input not validated and used in a template engine (server-side template injection).
 - Input not validated and passed to a dynamic code evaluation function such as `eval()`,
   `Function()`, `exec()`, `compile()`, or equivalent (code injection).
 - Input not validated and used for a deserialization processing using another format than
