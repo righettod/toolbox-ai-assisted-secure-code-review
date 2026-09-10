@@ -233,8 +233,25 @@ flowchart LR
 irm https://raw.githubusercontent.com/righettod/toolbox-ai-assisted-secure-code-review/main/install.ps1 | iex
 ```
 
+# Convert skills to other coding assistants
+
+> [!IMPORTANT]
+> Apply the steps indicated after having installed the Claude code skills inside the current folder.
+
+🤖 Use the user prompt `Please execute the conversion of Claude skills to [CODING_ASSISTANT_NAME] format as described in the [INSTRUCTION_MD_FILE_NAME] file.` to initiate the conversion.
+
+## Vibe
+
+1. Download the file [CONVERT_CLAUDE_SKILLS_TO_VIBE.md](CONVERT_CLAUDE_SKILLS_TO_VIBE.md) inside the current folder.
+2. Start a `vibe` session from the current folder.
+3. Use the user prompt above with the following variable:
+  * `[CODING_ASSISTANT_NAME]` to `Vibe CLI`.
+  * `[INSTRUCTION_MD_FILE_NAME]` to `CONVERT_CLAUDE_SKILLS_TO_VIBE.md`.
+4. Exit and restart a new session from the current folder.
+
 # References
 
 * <https://github.com/semgrep/semgrep>
 * <https://en.wikipedia.org/wiki/Sink_(computing)>
 * <https://breachforce.net/source-and-sinks>
+* <https://mistral.ai/products/vibe/>
