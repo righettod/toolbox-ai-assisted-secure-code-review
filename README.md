@@ -245,9 +245,40 @@ irm https://raw.githubusercontent.com/righettod/toolbox-ai-assisted-secure-code-
 1. Download the file [CONVERT_CLAUDE_SKILLS_TO_VIBE.md](CONVERT_CLAUDE_SKILLS_TO_VIBE.md) inside the current folder.
 2. Start a `vibe` session from the current folder.
 3. Use the user prompt above with the following variable:
-  * `[CODING_ASSISTANT_NAME]` to `Vibe CLI`.
-  * `[INSTRUCTION_MD_FILE_NAME]` to `CONVERT_CLAUDE_SKILLS_TO_VIBE.md`.
-4. Exit and restart a new session from the current folder.
+
+* `[CODING_ASSISTANT_NAME]` to `Vibe CLI`.
+* `[INSTRUCTION_MD_FILE_NAME]` to `CONVERT_CLAUDE_SKILLS_TO_VIBE.md`.
+
+Finally, exit and restart a new session from the current folder.
+
+# Coding assistant error troubleshooting
+
+## Vibe
+
+🐞 **Error:** `provider_message: Tool call id was ee61e87d-25d8-4bad-8e47-02939eb234c5 but must be a-z, A-Z, 0-9, with a length of 9.`
+
+ℹ️ Issue [1075](https://github.com/mistralai/mistral-vibe/issues/1075) open.
+
+💡 **Solution:** Patch the file `vibe/core/llm/backend/mistral.py` using the instruction below.
+
+* Use this command to find the location of the file `python -c "import vibe.core.llm.backend.mistral as m; print(m.__file__)"`.
+* Add this function at the top of the class `MistralMapper` and add the `import re`:
+
+```python
+@staticmethod
+def _normalize_tool_call_id(tool_id: str | None) -> str:
+    """Mistral requires tool call IDs to be exactly 9 alphanumeric characters."""
+    if not tool_id:
+        return "000000000"
+    clean = re.sub(r"[^a-zA-Z0-9]", "", tool_id)
+    # Pad if somehow shorter than 9 after stripping
+    clean = (clean + "000000000")[:9]
+    return clean
+```
+
+* In the function `parse_tool_calls` replace `id=tool_call.id,` by `id=self._normalize_tool_call_id(tool_call.id),`.
+* In the function `prepare_message` for `Role.assistant` replace `id=tc.id,` by `id=self._normalize_tool_call_id(tc.id),`.
+* In the function `prepare_message` for `Role.tool` replace `tool_call_id=msg.tool_call_id,` by `tool_call_id=self._normalize_tool_call_id(msg.tool_call_id),`.
 
 # References
 

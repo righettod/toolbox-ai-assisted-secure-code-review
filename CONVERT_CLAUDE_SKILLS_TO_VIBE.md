@@ -1,6 +1,7 @@
 # Convert Claude Skills to Vibe CLI Skills
 
 ## Objective
+
 Convert all skills from the `.claude/skills/` directory into Vibe CLI-compatible skills that can be used in this environment.
 
 ## Skills to Convert
@@ -42,16 +43,21 @@ For each skill, create a Vibe CLI-compatible skill by:
 ## Specific Conversion Notes
 
 ### For skills with sub-skills
+
 Some skills (like codebase-hotspotsv2) have complex structures with dedicated agent sub-skills. Each sub-skill in subdirectories should be converted as separate skills that can be invoked by the main orchestrator skill.
 
 ### For visualization skills
+
 Skills that generate visual outputs (like Mermaid flowcharts) should maintain their original output format, as Vibe CLI supports markdown and other visualization formats.
 
 ### For file parsing skills
+
 Skills that parse external files (like Semgrep SARIF/JSON output) should adapt their file reading logic to use Vibe CLI's file reading tools.
 
 ### General approach
+
 The conversion should preserve:
+
 - Core functionality and methodology
 - Output formats and structure
 - Security analysis logic
@@ -78,6 +84,7 @@ Create the converted skills in `.vibe/skills/` within the current directory. The
 ```
 
 The conversion process will:
+
 - Preserve the original directory hierarchy from `.claude/skills/`
 - Convert all SKILL.md files found in the directory tree
 - Maintain any sub-skill relationships (like agent directories)
@@ -100,6 +107,7 @@ The conversion process will:
 ## Verification
 
 After conversion, verify that:
+
 - All skills are properly formatted for Vibe CLI
 - Tool references are correctly mapped
 - Path references are updated
