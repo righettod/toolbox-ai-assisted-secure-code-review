@@ -251,7 +251,7 @@ irm https://raw.githubusercontent.com/righettod/toolbox-ai-assisted-secure-code-
 
 Finally, exit and restart a new session from the current folder.
 
-# Coding assistant error troubleshooting
+# Coding assistants error troubleshooting
 
 ## Vibe
 
