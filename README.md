@@ -221,7 +221,7 @@ flowchart LR
 
 ## Case 4: Coding assistant buddy to analyze a finding or a code section
 
-> [!TIP]
+> [!NOTE]
 > The skill has instruction to try to prevent the model of the coding assistant to have a confirmation bias problem. The instruction allows the coding assistant to search for grounded proof from the codebase and the documentation to truly reply to the hypothesis or question asked. It helps me to use the current coding assistant session to deep dive about my hypothesis.
 
 🤔 In this case, I have one of the following elements. I want to analyze the behavior of the feature to validate or invalidate the presence of an issue/risk from a security perspective:
