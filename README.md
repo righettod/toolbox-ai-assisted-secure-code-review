@@ -10,7 +10,7 @@
 
 1. Learn how to leverage AI, via a coding assistant (claude code here), in the context of a secure code review activity.
 2. Define a process to perform a secure code review with the help of AI via a coding assistant.
-3. Allow me to learn how to create instructions for a coding assistant to help me during an secure code review activity.
+3. Allow me to learn how to create instructions for a coding assistant to help me during a secure code review activity.
 
 # Toolbox usage approach
 
@@ -21,26 +21,26 @@ sequenceDiagram
     participant R2 as code-assistant-skills-security-utils
     participant R3 as toolbox-ai-assisted-secure-code-review
 
-    Me->>Me: Find an weakness during<br/>a secure code review.
+    Me->>Me: Find a weakness during<br/>a secure code review.
     alt Remediation not documented<br/>into the repository
         Me->>R1: Search, test, and create a new code snippet<br/>with a remediation proposal.
-        R1->>Me: Test and publising OK.
+        R1->>Me: Test and publishing OK.
     end
-    alt Skill do not exists<br/>into the repository<br/>"code-assistant-skills-security-utils"
-        Me->>R2: Use the test work done to create the corresponding skill<br/>to generate code that prevent the weakness by default.
-        R2->>Me: Test and publising OK.
+    alt Skill do not exist<br/>into the repository<br/>"code-assistant-skills-security-utils"
+        Me->>R2: Use the test work done to create the corresponding skill<br/>to generate code that prevents the weakness by default.
+        R2->>Me: Test and publishing OK.
     end
-    alt New skill created in repository<br/>"code-assistant-skills-security-utils"
+    alt New skill created into the repository<br/>"code-assistant-skills-security-utils"
         Me->>R3: Look to create, if relevant, a new dedicated agent using<br/>the content of the new skill created<br/>to detect the corresponding weakness.
-        R3->>Me: Test and publising OK.
+        R3->>Me: Test and publishing OK.
     end        
     alt Weakness not detected by the skill "codebase-hotspotsv2"<br/>so manually identified
         Me->>R3: Update the skill to detect the weakness.
-        R3->>Me: Test and publising OK.
+        R3->>Me: Test and publishing OK.
         Me->>R1: Create a code snippet for the corresponding remediation.
-        R1->>Me: Test and publising OK.
+        R1->>Me: Test and publishing OK.
         Me->>R2: Create a skill for the corresponding weakness.
-        R2->>Me: Test and publising OK.
+        R2->>Me: Test and publishing OK.
     end
 ```
 
@@ -60,16 +60,16 @@ sequenceDiagram
 
 🧑‍💻 For each module of the codebase into a claude code session **at the root folder of the module**, apply these steps:
 
-1. Scan the code with [SemGrep](https://github.com/semgrep/semgrep) to identify issues using a pattern-based approach: Goal is to identify issues not linked to a entry point, like for example, a deprecated algorithm used but not called from an entry point.
+1. Scan the code with [SemGrep](https://github.com/semgrep/semgrep) to identify issues using a pattern-based approach: Goal is to identify issues not linked to an entry point, like for example, a deprecated algorithm used but not called from an entry point.
 2. Start a new claude code session: *Important to isolate the processing from a context perspective*.
 3. Invoke the skill [`/codebase-semgrep-findings-review`](#case-3-review-the-semgrep-scan-of-the-codebase) to filter false positive findings from the SemGrep scan results.
 4. Start a new claude code session: *Important to isolate the processing from a context perspective*.
 5. Invoke the skill [`/codebase-hotspotsv2`](#case-2-codebase-hotspots) to identify entry point that leads to risk processing from a security perspective.
-6. Review and manually validate the result of step **3** + step **5**.
+6. Review and manually validate the result of step **3** + step **5** with the help of the skill [`/codebase-review-buddy`](#case-4-coding-assistant-buddy-to-analyze-a-finding-or-a-code-section).
 
 ⚠️ Important notes:
 
-* A approach **module by module** is used to speed-up the review.
+* An approach **module by module** is used to speed up the review.
 * The SemGrep scan is performed via this dedicated [toolbox](https://github.com/righettod/toolbox-codescan).
 
 # Origin of the creation of the skills based on different cases (context)
@@ -207,7 +207,7 @@ flowchart LR
 
 ## Case 3: Review the SemGrep scan of the codebase
 
-🤔 In this case, I scanned the codebase with SemGrep to identify issues not linked to a entry point, like for example, a deprecated algorithm used but not called from an entry point.
+🤔 In this case, I scanned the codebase with SemGrep to identify issues not linked to an entry point, like for example, a deprecated algorithm used but not called from an entry point.
 
 📦 User prompt is stored, as a `claude code skill`, into the file in the folder `.claude/skills/codebase-semgrep-findings-review/` ([ref](.claude/skills/codebase-semgrep-findings-review/SKILL.md)).
 
@@ -218,6 +218,21 @@ flowchart LR
 * `CONFIRMED`: Only confirmed findings.
 * `PARTIAL`: Confirmed + needs-human-review findings.
 * Default: `PARTIAL` - `FALSE_POSITIVE` verdicts are always excluded from the findings list but are recorded in the summary table.
+
+## Case 4: Coding assistant buddy to analyze a finding or a code section
+
+> [!TIP]
+> The skill has instruction to try to prevent the model of the coding assistant to have a confirmation bias problem. The instruction allows the coding assistant to search for grounded proof from the codebase and the documentation to truly reply to the hypothesis or question asked. It helps me to use the current coding assistant session to deep dive about my hypothesis.
+
+🤔 In this case, I have one of the following elements. I want to analyze the behavior of the feature to validate or invalidate the presence of an issue/risk from a security perspective:
+
+* The filtered findings from SemGrep.
+* The findings from the `codebase-hotspotsv2` skills.
+* A doubt about a code snippet that seems dangerous or strange for me.
+
+📦 User prompt is stored, as a `claude code skill`, into the file in the folder `.claude/skills/codebase-review-buddy/` ([ref](.claude/skills/codebase-review-buddy/SKILL.md)).
+
+🤖 Use it via this instruction inside a claude code session: `/codebase-review-buddy [FILE_PATH] [LINE_NUMBER] "[HYPOTHESIS_OR_QUESTION]"`.
 
 # Compatibility note
 
