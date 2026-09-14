@@ -102,6 +102,9 @@ The conversion process will:
    - Apply tool reference mappings (Read→read_file, etc.)
    - Update path references to point to `.vibe/skills/`
    - Preserve all original functionality and output formats
+   - Convert line endings from CRLF to LF using `dos2unix` or equivalent
+   - Replace problematic UTF-8 characters with ASCII equivalents
+   - Quote description fields containing colons to prevent YAML parsing errors
 4. Test that all converted skills can be discovered and loaded by Vibe CLI
 
 ## Verification
@@ -116,3 +119,47 @@ After conversion, verify that:
 - Skills appear in Vibe CLI autocomplete (`vibe skills list`)
 - Skills can be invoked successfully (`vibe skill <skill-name>`)
 - No files is missing for every converted skills.
+
+## Character Encoding and YAML Requirements
+
+### Character Encoding Handling
+
+1. **Line Endings:** Convert all files from CRLF (Windows) to LF (Unix) line endings using `dos2unix` or equivalent tool.
+
+2. **UTF-8 Character Replacement:** Replace problematic UTF-8 characters with ASCII equivalents:
+   - Em dash (`—`) → double hyphen (`--`)
+   - Rightwards arrow (`→`) → hyphen+greater-than (`->`)
+   - Leftwards arrow (`←`) → double hyphen (`--`)
+   - Horizontal ellipsis (`…`) → three periods (`...`)
+   - Smart quotes (`“”‘’`) → straight quotes (`""''`)
+   - Subscript numbers (`₁₂₃`) → regular numbers (`123`)
+
+### YAML Frontmatter Requirements
+
+3. **Description Field Quoting:** If the `description` field contains colons (`:`), it must be quoted to prevent YAML parsing errors:
+   ```yaml
+   # Correct format for descriptions with colons
+   description: "Text containing colons: like this example"
+   ```
+
+4. **Name Field Requirement:** Every skill must have a `name` field in the frontmatter that matches the directory name:
+   ```yaml
+   name: skill-directory-name
+   ```
+
+5. **Tool Reference Validation:** Ensure all tools referenced in `allowed-tools` are valid Vibe CLI tools and properly mapped from Claude equivalents.
+
+### Path Reference Updates
+
+6. **Remove Claude Path References:** Replace all references to `.claude/skills/` paths with generic descriptions or remove them entirely.
+
+7. **Shared Rules Handling:** For skills referencing shared rules files, update to use generic descriptions like "shared security rules" instead of specific file paths.
+
+### Validation Steps
+
+8. **YAML Validation:** After conversion, validate each SKILL.md file's frontmatter using:
+   ```bash
+   python -c "import yaml; content = open('SKILL.md').read(); parts = content.split('---'); yaml.safe_load(parts[1])"
+   ```
+
+9. **Comprehensive Testing:** Test all converted skills to ensure they can be discovered and loaded by Vibe CLI.
