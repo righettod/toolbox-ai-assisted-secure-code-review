@@ -253,7 +253,7 @@ irm https://raw.githubusercontent.com/righettod/toolbox-ai-assisted-secure-code-
 > [!IMPORTANT]
 > Apply the steps indicated after having installed the Claude code skills inside the current folder.
 
-🤖 Use the user prompt `Please execute the conversion of Claude skills to [CODING_ASSISTANT_NAME] format as described in the [INSTRUCTION_MD_FILE_NAME] file.` to initiate the conversion.
+🤖 Use the user prompt `Please execute the conversion of Claude skills to "[CODING_ASSISTANT_NAME]" format as described in the "[INSTRUCTION_MD_FILE_NAME]" file.` to initiate the conversion.
 
 ## Vibe
 
