@@ -20,7 +20,7 @@ For each skill, create a Vibe CLI-compatible skill by:
 
 1. **Creating a SKILL.md file** in the appropriate Vibe skills directory structure
 2. **Adapting the frontmatter** to Vibe CLI format:
-   - Keep the `name` field
+   - **Add or keep the `name` field**: Use the skill directory name as the value. This field is required by Vibe CLI but may be missing from original Claude skills.
    - Keep the `description` field
    - Remove `argument-hint` (Vibe uses different argument handling)
    - Map `allowed-tools` to Vibe's tool permissions
