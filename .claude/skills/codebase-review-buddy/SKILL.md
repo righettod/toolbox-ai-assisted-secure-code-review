@@ -107,10 +107,7 @@ Directly answer the reviewer's question or hypothesis. Structure the answer as f
 
 ## Output format
 
-Produce the answer using exactly this structure. Do not add, remove, or reorder sections. The placeholders `<verdict-emoji>` and `<confidence-emoji>` must be replaced with the corresponding emoji from the following legend — do not emit the placeholder text itself:
-
-- Verdict emoji+label: `🔴 Confirmed` for `HYPOTHESIS CONFIRMED` · `🟢 Refuted` for `HYPOTHESIS REFUTED` · `🟡 Inconclusive` for `INCONCLUSIVE`
-- Confidence emoji+label: `🟢 High` for `HIGH` · `🟡 Medium` for `MEDIUM` · `🔴 Low` for `LOW`
+Produce the answer using exactly this structure. Do not add, remove, or reorder sections.
 
 ```
 📄 **File:** <file-path>
@@ -138,8 +135,8 @@ If no bypass was found, state it explicitly.>
 
 ---
 
-⚖️ **Verdict:** `<HYPOTHESIS CONFIRMED | HYPOTHESIS REFUTED | INCONCLUSIVE>`  <verdict-emoji+label>
-🎯 **Confidence:** `<HIGH | MEDIUM | LOW>`  <confidence-emoji+label>
+⚖️ **Verdict:** `<HYPOTHESIS CONFIRMED | HYPOTHESIS REFUTED | INCONCLUSIVE>`
+🎯 **Confidence:** `<HIGH | MEDIUM | LOW>`
 
 ---
 
